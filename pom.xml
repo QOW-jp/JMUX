@@ -13,5 +13,18 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+    <dependencies>
+        <dependency>
+            <groupId>com.qow</groupId>
+            <artifactId>MSM4J</artifactId>
+            <version>1.0.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/MSM4J-1.0.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20250517</version>
+        </dependency>
+    </dependencies>
 </project>
