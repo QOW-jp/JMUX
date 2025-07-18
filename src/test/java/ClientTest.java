@@ -4,14 +4,13 @@ import com.qow.JMUXClient;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class ClientSample {
+public class ClientTest {
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
             System.err.println("args.length is not 1");
             System.exit(2);
         }
         String path = args[0];
-//        String path = "";
 
         JMUXClient jmuxClient = new JMUXClient(path);
         Scanner sc = new Scanner(System.in);
@@ -21,11 +20,11 @@ public class ClientSample {
             System.out.print("command>");
             command = Command.valueOf(sc.nextLine());
             System.out.print("tokenID>");
-            tokenID = sc.nextInt();
+            tokenID = Integer.parseInt(sc.nextLine());
 
-            System.out.print("send : " + jmuxClient.send(command, tokenID));
+            System.out.println("send : " + jmuxClient.send(command, tokenID));
 
-            if (tokenID == 0) break;
+            if (command == Command.EXIT) break;
         }
     }
 }

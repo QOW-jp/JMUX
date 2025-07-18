@@ -7,15 +7,31 @@ public class CommandFormatter {
     private byte[] data;
 
     public CommandFormatter(Command command, int tokenID) {
+        init();
         data = new byte[BYTE_SIZE];
-        data[0] = (byte) command.ordinal();
+        data[0] = (byte) command.getID();
         for (int i = 0; i < 4; i++) {
-            data[1 + i] = (byte) ((tokenID >> 8 * (3 - i)) & Byte.MAX_VALUE);
+            data[1 + i] = (byte) ((tokenID >> (8 * (3 - i))) & Byte.MAX_VALUE);
         }
     }
 
     public CommandFormatter(byte[] data) {
-        command = Command.valueOf(String.valueOf(data[0]));
+        init();
+        for (Command cmd : Command.values()) {
+            if (data[0] == cmd.getID()) {
+                command = cmd;
+            }
+        }
+        tokenID = 0;
+        for (int i = 0; i < 4; i++) {
+            tokenID += (int) data[1 + i] << (8 * (3 - i));
+        }
+    }
+
+    private void init() {
+        command = Command.EXCEPTION;
+        tokenID = -1;
+        data = null;
     }
 
     public Command getCommand() {

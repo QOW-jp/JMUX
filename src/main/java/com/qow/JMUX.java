@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,20 +16,15 @@ import java.util.Map;
 public class JMUX implements Runnable {
     private final Thread server;
     private final ServerSocket serverSocket;
-    private final int byteSize;
-    private final String stopCommand;
+    private final Map<Integer, Token> tokenMap;
     private boolean enable;
     private boolean run;
-
-    private final Map<Integer, Token> tokenMap;
 
     public JMUX(String path) throws IOException {
         enable = false;
         JsonReader jsonReader = new JsonReader(path);
         JSONObject json = jsonReader.getJSONObject();
 
-        byteSize = json.getInt("byte-size");
-        stopCommand = json.getString("stop-command");
         boolean bind = json.getBoolean("bind-ip");
         int port = json.getInt("port");
 
@@ -45,23 +39,27 @@ public class JMUX implements Runnable {
         tokenMap = new HashMap<>();
     }
 
-    public boolean enable() {
+    public synchronized boolean enable() {
         if (enable) return false;
-        if (run) return true;
+        if (run) return false;
         enable = true;
+        run = true;
         server.start();
-        return false;
+        return true;
+    }
+
+    public void disable() {
+        enable = false;
     }
 
     @Override
     public void run() {
-        run = true;
         int err = 0;
-        while (run) {
+        while (enable) {
             try (Socket sock = serverSocket.accept()) {
                 try (InputStream in = sock.getInputStream(); OutputStream out = sock.getOutputStream()) {
                     //受信データバッファ
-                    byte[] data = new byte[byteSize];
+                    byte[] data = new byte[CommandFormatter.BYTE_SIZE];
 
                     int readSize = in.read(data);
                     if (readSize == -1) continue;
@@ -69,16 +67,19 @@ public class JMUX implements Runnable {
                     //受信データを読み込んだサイズまで切り詰め
                     byte[] receiveData = Arrays.copyOf(data, readSize);
 
-                    //バイト配列を文字列に変換
-                    String line = new String(receiveData, StandardCharsets.UTF_8);
+                    CommandFormatter cf = new CommandFormatter(receiveData);
+                    Command command = cf.getCommand();
+                    int tokenID = cf.getTokenID();
 
-//                    commandRule.command(line);
-                    byte[] redata = command(new Byte2Command(receiveData));
+                    try {
+                        byte[] redata = {(byte) (command(command, tokenID) ? 1 : 0)};
 
-                    //送られてきた文字列をUTF-8形式のバイト配列に変換して返信
-                    out.write(redata);
+                        out.write(redata);
+                    }catch (NullPointerException ignored){
+                        out.write(new byte[]{0});
+                    }
 
-                    if (line.equals("STOP_JMUX")) {
+                    if (command == Command.EXIT) {
                         break;
                     }
 
@@ -93,21 +94,24 @@ public class JMUX implements Runnable {
         run = false;
     }
 
-    public byte[] command(Byte2Command command) {
-        switch (command.getCommand()) {
-            case EXIST:
-                break;
-            case STOP:
-                break;
-            case REQ:
-                break;
-            case EXCEPTION:
-                break;
-        }
+    public boolean command(Command command, int tokenID) {
+        return switch (command) {
+            case EXIT -> {
+                disable();
+                yield true;
+            }
+            case EXIST -> tokenMap.get(tokenID).isEnable();
+            case ENABLE -> tokenMap.get(tokenID).enable();
+            case DISABLE -> tokenMap.get(tokenID).disable();
+            case EXCEPTION -> false;
+        };
     }
 
     public void addToken(Token token) {
         tokenMap.put(token.getTokenID(), token);
+    }
 
+    public void removeToken(int tokenID) {
+        tokenMap.remove(tokenID);
     }
 }
