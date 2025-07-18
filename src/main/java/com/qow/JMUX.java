@@ -108,5 +108,6 @@ public class JMUX implements Runnable {
 
     public void addToken(Token token) {
         tokenMap.put(token.getTokenID(), token);
+
     }
 }

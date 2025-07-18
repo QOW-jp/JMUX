@@ -14,10 +14,10 @@ public class ServerSample {
 //        String path = "";
 
         JMUX jmux = new JMUX(path);
-        jmux.addToken(new TokenSample());
+        jmux.addToken(new TokenSample(1));
         System.out.println("start JMUX : " + jmux.enable());
     }
-    public class TokenSample extends Token {
+    public static class TokenSample extends Token {
 
         public TokenSample(int tokenID) {
             super(tokenID);
@@ -25,8 +25,9 @@ public class ServerSample {
 
         @Override
         public void start() {
-            System.out.print("");
+            System.out.print(">");
             Scanner sc = new Scanner(System.in);
+            System.out.println("<"+sc.nextLine());
         }
 
         @Override
