@@ -1,5 +1,6 @@
 import com.qow.Command;
 import com.qow.JMUXClient;
+import com.qow.UntrustedConnectException;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -22,7 +23,10 @@ public class ClientTest {
             System.out.print("tokenID>");
             tokenID = Integer.parseInt(sc.nextLine());
 
-            System.out.println("send : " + jmuxClient.send(command, tokenID));
+            try {
+                System.out.println("send : " + jmuxClient.send(command, tokenID));
+            } catch (UntrustedConnectException ignore) {
+            }
 
             if (command == Command.EXIT) break;
         }

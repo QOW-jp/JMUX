@@ -20,7 +20,7 @@ public class JMUXClient {
         port = controlJs.getInt("port");
     }
 
-    public boolean send(Command command, int tokenID) throws IOException {
+    public boolean send(Command command, int tokenID) throws IOException, UntrustedConnectException {
         try (Socket socket = new Socket(ip, port)) {
             try (OutputStream out = socket.getOutputStream(); InputStream in = socket.getInputStream()) {
                 //送受信データバッファ
@@ -34,6 +34,8 @@ public class JMUXClient {
                 //受信データを読み込んだサイズまで切り詰め
                 byte[] receiveData = Arrays.copyOf(data, readSize);
                 return receiveData[0] == 1;
+            } catch (IOException e) {
+                throw new UntrustedConnectException("disconnect");
             }
         }
     }
