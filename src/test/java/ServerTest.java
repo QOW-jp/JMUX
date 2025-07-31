@@ -1,5 +1,5 @@
-import com.qow.JMUX;
-import com.qow.Token;
+import com.qow.jmux.JMUX;
+import com.qow.jmux.Token;
 
 import java.io.IOException;
 
@@ -14,6 +14,8 @@ public class ServerTest {
         JMUX jmux = new JMUX(path);
         jmux.addToken(new TokenTest(1));
         System.out.println("start JMUX : " + jmux.enable());
+        jmux.waitForServer();
+        System.exit(3);
     }
 
     public static class TokenTest extends Token {
@@ -39,7 +41,7 @@ public class ServerTest {
 
         @Override
         public void stop() {
-            System.out.print("<TokenTest>stop();");
+            System.out.println("<TokenTest>stop();");
             loop = false;
         }
     }

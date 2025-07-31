@@ -1,4 +1,4 @@
-package com.qow;
+package com.qow.jmux;
 
 public class CommandFormatter {
     public static final int BYTE_SIZE = 5;

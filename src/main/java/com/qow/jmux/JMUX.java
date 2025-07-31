@@ -1,6 +1,7 @@
-package com.qow;
+package com.qow.jmux;
 
 import com.qow.util.JsonReader;
+import com.qow.util.ThreadStopper;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class JMUX implements Runnable {
     private final Thread server;
     private final ServerSocket serverSocket;
     private final Map<Integer, Token> tokenMap;
+    private final ThreadStopper stopper;
     private boolean enable;
     private boolean run;
 
@@ -37,6 +39,8 @@ public class JMUX implements Runnable {
         server = new Thread(this);
 
         tokenMap = new HashMap<>();
+
+        stopper = new ThreadStopper();
     }
 
     public synchronized boolean enable() {
@@ -75,7 +79,7 @@ public class JMUX implements Runnable {
                         byte[] redata = {(byte) (command(command, tokenID) ? 1 : 0)};
 
                         out.write(redata);
-                    }catch (NullPointerException ignored){
+                    } catch (NullPointerException ignored) {
                         out.write(new byte[]{0});
                     }
 
@@ -91,7 +95,14 @@ public class JMUX implements Runnable {
                 if (1 < err++) e.printStackTrace();
             }
         }
-        run = false;
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            run = false;
+            stopper.start();
+        }
     }
 
     public boolean command(Command command, int tokenID) {
@@ -103,6 +114,7 @@ public class JMUX implements Runnable {
             case EXIST -> tokenMap.get(tokenID).isEnable();
             case ENABLE -> tokenMap.get(tokenID).enable();
             case DISABLE -> tokenMap.get(tokenID).disable();
+            case RESET -> tokenMap.get(tokenID).reset();
             case EXCEPTION -> false;
         };
     }
@@ -113,5 +125,9 @@ public class JMUX implements Runnable {
 
     public void removeToken(int tokenID) {
         tokenMap.remove(tokenID);
+    }
+
+    public void waitForServer() {
+        stopper.stop();
     }
 }

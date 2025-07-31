@@ -1,4 +1,4 @@
-package com.qow;
+package com.qow.jmux;
 
 import com.qow.util.JsonReader;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class JMUXClient {
         port = controlJs.getInt("port");
     }
 
-    public boolean send(Command command, int tokenID) throws IOException, UntrustedConnectException {
+    public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException {
         try (Socket socket = new Socket(ip, port)) {
             try (OutputStream out = socket.getOutputStream(); InputStream in = socket.getInputStream()) {
                 //送受信データバッファ
@@ -37,6 +37,8 @@ public class JMUXClient {
             } catch (IOException e) {
                 throw new UntrustedConnectException("disconnect");
             }
+        } catch (IOException e) {
+            throw new ClosedServerException("no server");
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.qow;
+package com.qow.jmux;
 
 public abstract class Token {
     private final int tokenID;
@@ -28,6 +28,10 @@ public abstract class Token {
         if (!run) return false;
         stop();
         run = false;
+        return true;
+    }
+
+    public boolean reset() {
         return true;
     }
 
