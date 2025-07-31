@@ -9,10 +9,21 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 
+/**
+ * {@link JMUX}と通信するためのクライアント
+ *
+ * @version 2025/08/01
+ * @since 1.0.0
+ */
 public class JMUXClient {
     private final String ip;
     private final int port;
 
+    /**
+     * configに従い、対象サーバーIPアドレスとポート番号を設定する
+     *
+     * @param jsonPath configファイルのパス
+     */
     public JMUXClient(String jsonPath) {
         JsonReader jsonReader = new JsonReader(jsonPath);
         JSONObject controlJs = jsonReader.getJSONObject();
@@ -20,6 +31,15 @@ public class JMUXClient {
         port = controlJs.getInt("port");
     }
 
+    /**
+     * {@link JMUX}にデータを送信する
+     *
+     * @param command 送信するコマンド
+     * @param tokenID 送信するID
+     * @return 正常に送信できた場合True
+     * @throws UntrustedConnectException 接続が途切れた場合
+     * @throws ClosedServerException     接続ができなかった場合
+     */
     public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException {
         try (Socket socket = new Socket(ip, port)) {
             try (OutputStream out = socket.getOutputStream(); InputStream in = socket.getInputStream()) {

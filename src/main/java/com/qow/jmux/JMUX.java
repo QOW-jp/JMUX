@@ -14,6 +14,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
+ * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出すことができる
+ *
+ * @version 2025/08/01
+ * @since 1.0.0
+ */
 public class JMUX implements Runnable {
     private final Thread server;
     private final ServerSocket serverSocket;
@@ -22,6 +29,12 @@ public class JMUX implements Runnable {
     private boolean enable;
     private boolean run;
 
+    /**
+     * configに従い、対象クライアントIPアドレスとポート番号を設定する
+     *
+     * @param path configファイルのパス
+     * @throws IOException サーバーソケットに例外が発生した場合
+     */
     public JMUX(String path) throws IOException {
         enable = false;
         JsonReader jsonReader = new JsonReader(path);
@@ -43,6 +56,11 @@ public class JMUX implements Runnable {
         stopper = new ThreadStopper();
     }
 
+    /**
+     * 入力受付するサーバーを有効化する
+     *
+     * @return 正常に実行できた場合
+     */
     public synchronized boolean enable() {
         if (enable) return false;
         if (run) return false;
@@ -52,6 +70,9 @@ public class JMUX implements Runnable {
         return true;
     }
 
+    /**
+     * 次回からの入力受付を無効化する
+     */
     public void disable() {
         enable = false;
     }
@@ -105,6 +126,13 @@ public class JMUX implements Runnable {
         }
     }
 
+    /**
+     * コマンドを実行する
+     *
+     * @param command コマンド
+     * @param tokenID 対象ID
+     * @return 各メソッドの実行結果を返す
+     */
     public boolean command(Command command, int tokenID) {
         return switch (command) {
             case EXIT -> {
@@ -119,14 +147,27 @@ public class JMUX implements Runnable {
         };
     }
 
+    /**
+     * {@link Token}を追加する
+     *
+     * @param token 追加するToken
+     */
     public void addToken(Token token) {
         tokenMap.put(token.getTokenID(), token);
     }
 
+    /**
+     * {@link Token}を削除する
+     *
+     * @param tokenID 対象のID
+     */
     public void removeToken(int tokenID) {
         tokenMap.remove(tokenID);
     }
 
+    /**
+     * 入力受付するサーバーが終了するまで待機する
+     */
     public void waitForServer() {
         stopper.stop();
     }
