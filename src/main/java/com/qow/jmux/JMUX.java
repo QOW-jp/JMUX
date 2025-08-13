@@ -14,9 +14,9 @@ import java.util.*;
 
 /**
  * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
- * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出すことができる
+ * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出す
  *
- * @version 2025/08/01
+ * @version 2025/08/14
  * @since 1.0.0
  */
 public class JMUX implements Runnable {
@@ -138,7 +138,7 @@ public class JMUX implements Runnable {
                 disable();
                 List<Token> tokenList = new ArrayList<>(tokenMap.values());
                 for (Token token : tokenList) {
-                    token.disable();
+                    if(token.isEnable()) token.disable();
                 }
                 yield true;
             }

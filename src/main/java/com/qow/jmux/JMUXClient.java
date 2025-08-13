@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * {@link JMUX}と通信するためのクライアント
  *
- * @version 2025/08/01
+ * @version 2025/08/14
  * @since 1.0.0
  */
 public class JMUXClient {
@@ -36,7 +36,7 @@ public class JMUXClient {
      *
      * @param command 送信するコマンド
      * @param tokenID 送信するID
-     * @return 正常に送信できた場合True
+     * @return {@link Command}の結果を返す
      * @throws UntrustedConnectException 接続が途切れた場合
      * @throws ClosedServerException     接続ができなかった場合
      */
