@@ -73,7 +73,7 @@ public abstract class Token {
      * {@link Token#enable()}により実行後最後に呼び出す必要がある<br>
      * または{@link Token#disable()}により呼び出される
      */
-    public final void stopped() {
+    public void stopped() {
         run = false;
     }
 

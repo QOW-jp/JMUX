@@ -10,9 +10,10 @@ public enum Command {
     EXCEPTION(-1),
     EXIT(0),
     EXIST(1),
-    ENABLE(2),
-    DISABLE(3),
-    RESET(4);
+    LISTED(2),
+    ENABLE(3),
+    DISABLE(4),
+    RESET(5);
 
     private final int id;
 

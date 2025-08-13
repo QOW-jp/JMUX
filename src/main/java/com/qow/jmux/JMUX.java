@@ -10,9 +10,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
@@ -122,6 +120,7 @@ public class JMUX implements Runnable {
             throw new RuntimeException(e);
         } finally {
             run = false;
+            enable = false;
             stopper.start();
         }
     }
@@ -137,9 +136,14 @@ public class JMUX implements Runnable {
         return switch (command) {
             case EXIT -> {
                 disable();
+                List<Token> tokenList = new ArrayList<>(tokenMap.values());
+                for (Token token : tokenList) {
+                    token.disable();
+                }
                 yield true;
             }
             case EXIST -> tokenMap.get(tokenID).isEnable();
+            case LISTED -> tokenMap.containsKey(tokenID);
             case ENABLE -> tokenMap.get(tokenID).enable();
             case DISABLE -> tokenMap.get(tokenID).disable();
             case RESET -> tokenMap.get(tokenID).reset();
