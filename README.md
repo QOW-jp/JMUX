@@ -6,16 +6,13 @@ Java 17 or later
 
 ## Getting started
 
-| 項目      | 詳細               |
-|---------|------------------|
-| OS      | Ubuntu 22.04 LTS |
+| 項目 | 詳細               |
+|----|------------------|
+| OS | Ubuntu 22.04 LTS |
 
 ```
-1. java ServerTest [qonPath]
-2. java ClientTest [qonPath]
-
-※[qonPath] = jmux.qon
-args[0] = qonPath
+1. java ServerTest
+2. java ClientTest
 ```
 
 #### ServerTest.java
@@ -28,13 +25,11 @@ import java.io.IOException;
 
 public class ServerTest {
     public static void main(String[] args) throws IOException {
-        if (args.length != 1) {
-            System.err.println("args.length is not 1");
-            System.exit(2);
-        }
-        String path = args[0];
+        int port = 9999;
+        String clientIp = "localhost";
 
-        JMUX jmux = new JMUX(path);
+        JMUX jmux = new JMUX(port, clientIp);
+
         jmux.addToken(new TokenTest(1));
         System.out.println("start JMUX : " + jmux.enable());
         jmux.waitForServer();
@@ -84,15 +79,12 @@ import java.util.Scanner;
 
 public class ClientTest {
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("args.length is not 1");
-            System.exit(2);
-        }
-        String path = args[0];
-
         System.out.println(Arrays.toString(Command.values()));
 
-        JMUXClient jmuxClient = new JMUXClient(path);
+        String host = "localhost";
+        int port = 9999;
+
+        JMUXClient jmuxClient = new JMUXClient(host, port);
         Scanner sc = new Scanner(System.in);
         while (true) {
             Command command;
@@ -115,16 +107,5 @@ public class ClientTest {
             if (command == Command.EXIT) break;
         }
     }
-}
-```
-
-#### jmux.json
-
-```json
-{
-  "bind-ip": true,
-  "server-ip": "localhost",
-  "client-ip": "localhost",
-  "port": 51101
 }
 ```
