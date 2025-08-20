@@ -1,8 +1,5 @@
 package com.qow.jmux;
 
-import com.qow.util.JsonReader;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,27 +9,26 @@ import java.util.Arrays;
 /**
  * {@link JMUX}と通信するためのクライアント
  *
- * @version 2025/08/14
+ * @version 2025/08/20
  * @since 1.0.0
  */
 public class JMUXClient {
-    private final String ip;
+    private final String host;
     private final int port;
 
     /**
-     * configに従い、対象サーバーIPアドレスとポート番号を設定する
+     * 対象サーバーIPアドレスとポート番号を設定する。
      *
-     * @param jsonPath configファイルのパス
+     * @param host サーバーIPアドレス
+     * @param port ポート番号
      */
-    public JMUXClient(String jsonPath) {
-        JsonReader jsonReader = new JsonReader(jsonPath);
-        JSONObject controlJs = jsonReader.getJSONObject();
-        ip = controlJs.getString("server-ip");
-        port = controlJs.getInt("port");
+    public JMUXClient(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
     /**
-     * {@link JMUX}にデータを送信する
+     * {@link JMUX}にデータを送信する。
      *
      * @param command 送信するコマンド
      * @param tokenID 送信するID
@@ -41,7 +37,7 @@ public class JMUXClient {
      * @throws ClosedServerException     接続ができなかった場合
      */
     public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException {
-        try (Socket socket = new Socket(ip, port)) {
+        try (Socket socket = new Socket(host, port)) {
             try (OutputStream out = socket.getOutputStream(); InputStream in = socket.getInputStream()) {
                 //送受信データバッファ
                 byte[] data = new CommandFormatter(command, tokenID).getData();

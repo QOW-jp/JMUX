@@ -2,7 +2,7 @@
 
 ### Requirements
 
-Java 21 or later
+Java 17 or later
 
 ## Getting started
 
@@ -11,11 +11,11 @@ Java 21 or later
 | OS      | Ubuntu 22.04 LTS |
 
 ```
-1. java ServerTest [jsonPath]
-2. java ClientTest [jsonPath]
+1. java ServerTest [qonPath]
+2. java ClientTest [qonPath]
 
-※[jsonPath] = jmux.json
-args[0] = jsonPath
+※[qonPath] = jmux.qon
+args[0] = qonPath
 ```
 
 #### ServerTest.java

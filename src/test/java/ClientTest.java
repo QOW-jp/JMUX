@@ -2,12 +2,16 @@ import com.qow.jmux.ClosedServerException;
 import com.qow.jmux.Command;
 import com.qow.jmux.JMUXClient;
 import com.qow.jmux.UntrustedConnectException;
+import com.qow.util.qon.QONObject;
+import com.qow.util.qon.UntrustedQONException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class ClientTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UntrustedQONException, IOException {
         if (args.length != 1) {
             System.err.println("args.length is not 1");
             System.exit(2);
@@ -16,7 +20,11 @@ public class ClientTest {
 
         System.out.println(Arrays.toString(Command.values()));
 
-        JMUXClient jmuxClient = new JMUXClient(path);
+        QONObject controlJs = new QONObject(new File(path));
+        String host = controlJs.get("server-ip");
+        int port = Integer.parseInt(controlJs.get("port"));
+
+        JMUXClient jmuxClient = new JMUXClient(host,port);
         Scanner sc = new Scanner(System.in);
         while (true) {
             Command command;

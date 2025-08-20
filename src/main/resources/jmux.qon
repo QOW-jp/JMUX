@@ -1,0 +1,8 @@
+#Server IP
+server-ip=localhost
+#Server port
+port=9999
+#Enable bind IP
+bind-ip=true
+#Client IP
+client-ip=localhost

@@ -1,8 +1,6 @@
 package com.qow.jmux;
 
-import com.qow.util.JsonReader;
 import com.qow.util.ThreadStopper;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +14,7 @@ import java.util.*;
  * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
  * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出す
  *
- * @version 2025/08/14
+ * @version 2025/08/20
  * @since 1.0.0
  */
 public class JMUX implements Runnable {
@@ -28,25 +26,17 @@ public class JMUX implements Runnable {
     private boolean run;
 
     /**
-     * configに従い、対象クライアントIPアドレスとポート番号を設定する
+     * ポート番号と対象クライアントIPアドレスを指定し、入力を受け付けるIPアドレスを制限する。
      *
-     * @param path configファイルのパス
+     * @param port サーバーポート番号
+     * @param host クライアントIPアドレス
      * @throws IOException サーバーソケットに例外が発生した場合
      */
-    public JMUX(String path) throws IOException {
+    public JMUX(int port, String host) throws IOException {
         enable = false;
-        JsonReader jsonReader = new JsonReader(path);
-        JSONObject json = jsonReader.getJSONObject();
 
-        boolean bind = json.getBoolean("bind-ip");
-        int port = json.getInt("port");
+        serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
 
-        if (bind) {
-            String clientIp = json.getString("client-ip");
-            serverSocket = new ServerSocket(port, 50, InetAddress.getByName(clientIp));
-        } else {
-            serverSocket = new ServerSocket(port);
-        }
         server = new Thread(this);
 
         tokenMap = new HashMap<>();
@@ -55,7 +45,25 @@ public class JMUX implements Runnable {
     }
 
     /**
-     * 入力受付するサーバーを有効化する
+     * ポート番号を設定する。
+     *
+     * @param port サーバーポート番号
+     * @throws IOException サーバーソケットに例外が発生した場合
+     */
+    public JMUX(int port) throws IOException {
+        enable = false;
+
+        serverSocket = new ServerSocket(port);
+
+        server = new Thread(this);
+
+        tokenMap = new HashMap<>();
+
+        stopper = new ThreadStopper();
+    }
+
+    /**
+     * 入力受付するサーバーを有効化する。
      *
      * @return 正常に実行できた場合
      */
@@ -138,7 +146,7 @@ public class JMUX implements Runnable {
                 disable();
                 List<Token> tokenList = new ArrayList<>(tokenMap.values());
                 for (Token token : tokenList) {
-                    if(token.isEnable()) token.disable();
+                    if (token.isEnable()) token.disable();
                 }
                 yield true;
             }
