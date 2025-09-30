@@ -1,4 +1,3 @@
-#Server IP
 server-ip=localhost
 #Server port
 port=9999

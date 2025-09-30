@@ -1,8 +1,8 @@
-import com.qow.jmux.ClosedServerException;
 import com.qow.jmux.Command;
 import com.qow.jmux.JMUXClient;
-import com.qow.jmux.UntrustedConnectException;
+import com.qow.qtcp.UntrustedConnectException;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -27,10 +27,8 @@ public class ClientTest {
 
             try {
                 System.out.println("send : " + jmuxClient.send(command, tokenID));
-            } catch (UntrustedConnectException e) {
-                System.err.println(e.getMessage());
-            } catch (ClosedServerException e) {
-                System.err.println("server closed");
+            } catch (IOException | UntrustedConnectException e) {
+                throw new RuntimeException(e);
             }
 
             if (command == Command.EXIT) break;

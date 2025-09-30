@@ -1,25 +1,26 @@
 package com.qow.jmux;
 
+import com.qow.qtcp.TCPServer;
+import com.qow.qtcp.UntrustedConnectException;
 import com.qow.util.ThreadStopper;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
  * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出す
  *
- * @version 2025/08/20
+ * @version 2025/09/30
  * @since 1.0.0
  */
-public class JMUX implements Runnable {
+public class JMUX extends TCPServer implements Runnable {
+    public static final byte[] PROTOCOL_ID = "jmux-s1.2.0".getBytes(StandardCharsets.UTF_8);
     private final Thread server;
-    private final ServerSocket serverSocket;
     private final Map<Integer, Token> tokenMap;
     private final ThreadStopper stopper;
     private boolean enable;
@@ -33,14 +34,12 @@ public class JMUX implements Runnable {
      * @throws IOException サーバーソケットに例外が発生した場合
      */
     public JMUX(int port, String host) throws IOException {
-        enable = false;
-
-        serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
-
-        server = new Thread(this);
+        super(port, PROTOCOL_ID, host);
 
         tokenMap = new HashMap<>();
+        enable = false;
 
+        server = new Thread(this);
         stopper = new ThreadStopper();
     }
 
@@ -51,14 +50,12 @@ public class JMUX implements Runnable {
      * @throws IOException サーバーソケットに例外が発生した場合
      */
     public JMUX(int port) throws IOException {
-        enable = false;
-
-        serverSocket = new ServerSocket(port);
-
-        server = new Thread(this);
+        super(port, PROTOCOL_ID);
 
         tokenMap = new HashMap<>();
+        enable = false;
 
+        server = new Thread(this);
         stopper = new ThreadStopper();
     }
 
@@ -87,49 +84,41 @@ public class JMUX implements Runnable {
     public void run() {
         int err = 0;
         while (enable) {
-            try (Socket sock = serverSocket.accept()) {
-                try (InputStream in = sock.getInputStream(); OutputStream out = sock.getOutputStream()) {
-                    //受信データバッファ
-                    byte[] data = new byte[CommandFormatter.BYTE_SIZE];
-
-                    int readSize = in.read(data);
-                    if (readSize == -1) continue;
-
-                    //受信データを読み込んだサイズまで切り詰め
-                    byte[] receiveData = Arrays.copyOf(data, readSize);
-
-                    CommandFormatter cf = new CommandFormatter(receiveData);
-                    Command command = cf.getCommand();
-                    int tokenID = cf.getTokenID();
-
-                    try {
-                        byte[] redata = {(byte) (command(command, tokenID) ? 1 : 0)};
-
-                        out.write(redata);
-                    } catch (NullPointerException ignored) {
-                        out.write(new byte[]{0});
-                    }
-
-                    if (command == Command.EXIT) {
-                        break;
-                    }
-
-                    err = 0;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                listeningRequest();
+                err = 0;
             } catch (IOException e) {
-                if (1 < err++) e.printStackTrace();
+                if (1 < err++) System.err.println(e.getMessage());
+            } catch (UntrustedConnectException e) {
+                throw new RuntimeException(e);
             }
         }
         try {
-            serverSocket.close();
+            close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             run = false;
             enable = false;
             stopper.start();
+        }
+    }
+
+    @Override
+    public byte[] read(byte[] data) {
+        CommandFormatter cf = new CommandFormatter(data);
+        Command command = cf.getCommand();
+
+        if (command == Command.EXIT) {
+            enable = false;
+        }
+
+        int tokenID = cf.getTokenID();
+
+        try {
+            return new byte[]{(byte) (command(command, tokenID) ? 1 : 0)};
+        } catch (NullPointerException ignored) {
+            return new byte[]{0};
         }
     }
 
