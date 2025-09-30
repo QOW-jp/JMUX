@@ -1,5 +1,6 @@
 package com.qow.jmux;
 
+import com.qow.qtcp.ClosedServerException;
 import com.qow.qtcp.TCPClient;
 import com.qow.qtcp.UntrustedConnectException;
 
@@ -30,7 +31,7 @@ public class JMUXClient extends TCPClient {
      * @return {@link Command}の結果を返す
      * @throws UntrustedConnectException 接続が途切れた場合
      */
-    public boolean send(Command command, int tokenID) throws UntrustedConnectException, IOException {
+    public boolean send(Command command, int tokenID) throws UntrustedConnectException, IOException, ClosedServerException {
         //送受信データバッファ
         byte[] data = new CommandFormatter(command, tokenID).getData();
         //受信データを読み込んだサイズまで切り詰め

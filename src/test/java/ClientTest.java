@@ -1,5 +1,6 @@
 import com.qow.jmux.Command;
 import com.qow.jmux.JMUXClient;
+import com.qow.qtcp.ClosedServerException;
 import com.qow.qtcp.UntrustedConnectException;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class ClientTest {
 
             try {
                 System.out.println("send : " + jmuxClient.send(command, tokenID));
-            } catch (IOException | UntrustedConnectException e) {
+            } catch (IOException | UntrustedConnectException | ClosedServerException e) {
                 throw new RuntimeException(e);
             }
 
