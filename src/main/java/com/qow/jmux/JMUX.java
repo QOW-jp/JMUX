@@ -87,16 +87,14 @@ public class JMUX extends TCPServer implements Runnable {
             try {
                 listeningRequest();
                 err = 0;
-            } catch (IOException e) {
+            } catch (IOException | UntrustedConnectException e) {
                 if (1 < err++) System.err.println(e.getMessage());
-            } catch (UntrustedConnectException e) {
-                throw new RuntimeException(e);
             }
         }
         try {
             close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println(e.getMessage());
         } finally {
             run = false;
             enable = false;
