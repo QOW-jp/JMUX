@@ -9,18 +9,19 @@ import java.io.IOException;
 /**
  * {@link JMUX}と通信するためのクライアント
  *
- * @version 2025/09/30
+ * @version 2025/10/08
  * @since 1.0.0
  */
 public class JMUXClient extends TCPClient {
     /**
      * 対象サーバーIPアドレスとポート番号を設定する。
      *
-     * @param host サーバーIPアドレス
-     * @param port ポート番号
+     * @param host       サーバーIPアドレス
+     * @param port       ポート番号
+     * @param protocolID 識別子
      */
-    public JMUXClient(String host, int port) {
-        super(host, port, JMUX.PROTOCOL_ID);
+    public JMUXClient(String host, int port, byte[] protocolID) {
+        super(host, port, protocolID);
     }
 
     /**

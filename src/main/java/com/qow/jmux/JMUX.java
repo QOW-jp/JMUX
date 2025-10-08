@@ -5,7 +5,6 @@ import com.qow.qtcp.UntrustedConnectException;
 import com.qow.util.ThreadStopper;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +14,10 @@ import java.util.Map;
  * JMUX(Java Multiplexer)は複数のJavaプログラムを同時に遠隔で操作することができる<br>
  * {@link Token}を継承したクラスを{@link JMUX#addToken(Token)}により追加し、遠隔の場合は{@link JMUXClient#send(Command, int)}により呼び出す
  *
- * @version 2025/09/30
+ * @version 2025/10/08
  * @since 1.0.0
  */
 public class JMUX extends TCPServer implements Runnable {
-    public static final byte[] PROTOCOL_ID = "jmux-s1.2.0".getBytes(StandardCharsets.UTF_8);
     private final Thread server;
     private final Map<Integer, Token> tokenMap;
     private final ThreadStopper stopper;
@@ -29,12 +27,13 @@ public class JMUX extends TCPServer implements Runnable {
     /**
      * ポート番号と対象クライアントIPアドレスを指定し、入力を受け付けるIPアドレスを制限する。
      *
-     * @param port サーバーポート番号
-     * @param host クライアントIPアドレス
+     * @param port       サーバーポート番号
+     * @param protocolID 識別子
+     * @param host       クライアントIPアドレス
      * @throws IOException サーバーソケットに例外が発生した場合
      */
-    public JMUX(int port, String host) throws IOException {
-        super(port, PROTOCOL_ID, host);
+    public JMUX(int port, byte[] protocolID, String host) throws IOException {
+        super(port, protocolID, host);
 
         tokenMap = new HashMap<>();
         enable = false;
@@ -46,11 +45,12 @@ public class JMUX extends TCPServer implements Runnable {
     /**
      * ポート番号を設定する。
      *
-     * @param port サーバーポート番号
+     * @param port       サーバーポート番号
+     * @param protocolID 識別子
      * @throws IOException サーバーソケットに例外が発生した場合
      */
-    public JMUX(int port) throws IOException {
-        super(port, PROTOCOL_ID);
+    public JMUX(int port, byte[] protocolID) throws IOException {
+        super(port, protocolID);
 
         tokenMap = new HashMap<>();
         enable = false;

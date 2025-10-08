@@ -2,13 +2,15 @@ import com.qow.jmux.JMUX;
 import com.qow.jmux.Token;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class ServerTest {
     public static void main(String[] args) throws IOException {
         int port = 9999;
+        byte[] protocolID = "JMUX".getBytes(StandardCharsets.UTF_8);
         String clientIp = "localhost";
 
-        JMUX jmux = new JMUX(port, clientIp);
+        JMUX jmux = new JMUX(port, protocolID, clientIp);
 
         jmux.addToken(new TokenTest(1));
         System.out.println("start JMUX : " + jmux.enable());

@@ -4,6 +4,7 @@ import com.qow.qtcp.ClosedServerException;
 import com.qow.qtcp.UntrustedConnectException;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -13,8 +14,9 @@ public class ClientTest {
 
         String host = "localhost";
         int port = 9999;
+        byte[] protocolID = "JMUX".getBytes(StandardCharsets.UTF_8);
 
-        JMUXClient jmuxClient = new JMUXClient(host, port);
+        JMUXClient jmuxClient = new JMUXClient(host, port, protocolID);
         Scanner sc = new Scanner(System.in);
         while (true) {
             Command command;
