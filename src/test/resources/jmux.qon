@@ -1,7 +1,12 @@
+#qon file 4 jmux config v1.3.1
+#Requirements qon4j v1.1.0
+#Server IP
 server-ip=localhost
 #Server port
 port=9999
 #Enable bind IP
 bind-ip=true
-#Client IP
+#Client IP (Only when bind-ip=true)
 client-ip=localhost
+#Protocol ID
+protocol-id=jmux-default
