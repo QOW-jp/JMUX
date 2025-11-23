@@ -1,20 +1,45 @@
 import com.qow.jmux.JMUX;
 import com.qow.jmux.Token;
+import com.qow.util.qon.NoSuchKeyException;
+import com.qow.util.qon.QONObject;
+import com.qow.util.qon.UntrustedQONException;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ServerTest {
-    public static void main(String[] args) throws IOException {
-        int port = 9999;
+    public static void main(String[] args) throws IOException, UntrustedQONException, NoSuchKeyException {
         byte[] protocolID = "JMUX".getBytes(StandardCharsets.UTF_8);
-        String clientIp = "localhost";
 
-        JMUX jmux = new JMUX(port, protocolID, clientIp);
+        QONObject qon = new QONObject(new File("src/test/resources/jmux.qon"));
+        String clientIp = qon.get("client-ip");
 
-        jmux.addToken(new TokenTest(1));
-        System.out.println("start JMUX : " + jmux.enable());
-        jmux.waitForServer();
+        int port = 0;
+        boolean autoPorting = Boolean.parseBoolean(qon.get("auto-porting"));
+        if (!autoPorting) {
+            port = Integer.parseInt(qon.get("port"));
+        }
+
+        try (JMUX jmux = new JMUX(port, protocolID, clientIp)) {
+
+            if (autoPorting) {
+                int activedPort = jmux.getLocalPort();
+                File temp = new File(qon.get("port-temp"));
+                Path parent = Path.of(temp.getParent());
+                Files.createDirectories(parent);
+                try (FileWriter fw = new FileWriter(temp)) {
+                    try (PrintWriter pw = new PrintWriter(new BufferedWriter(fw))) {
+                        pw.println(activedPort);
+                    }
+                }
+            }
+
+            jmux.addToken(new TokenTest(1));
+            System.out.println("start JMUX : " + jmux.enable());
+            jmux.waitForServer();
+        }
         System.exit(3);
     }
 

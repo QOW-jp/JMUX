@@ -1,9 +1,13 @@
-#qon file 4 jmux config v1.3.1
-#Requirements qon4j v1.1.0
+#qon file 4 jmux config v1.4.0
+#Requirements qon4j v1.1.0 or later
 #Server IP
 server-ip=localhost
 #Server port
 port=9999
+#Enable auto port
+auto-porting=true
+#Server port temp file path
+port-temp=$(home-dir)/jmux_port.temp
 #Enable bind IP
 bind-ip=true
 #Client IP (Only when bind-ip=true)
