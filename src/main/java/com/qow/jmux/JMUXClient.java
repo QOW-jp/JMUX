@@ -4,12 +4,10 @@ import com.qow.qtcp.ClosedServerException;
 import com.qow.qtcp.TCPClient;
 import com.qow.qtcp.UntrustedConnectException;
 
-import java.io.IOException;
-
 /**
  * {@link JMUX}と通信するためのクライアント
  *
- * @version 2025/10/08
+ * @version 2025/11/25
  * @since 1.0.0
  */
 public class JMUXClient extends TCPClient {
@@ -31,11 +29,10 @@ public class JMUXClient extends TCPClient {
      * @param tokenID 送信するID
      * @return {@link Command}の結果を返す
      * @throws UntrustedConnectException 接続が途切れた場合
+     * @throws ClosedServerException     サーバーのポートが無効化されている場合
      */
-    public boolean send(Command command, int tokenID) throws UntrustedConnectException, IOException, ClosedServerException {
-        //送受信データバッファ
+    public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException {
         byte[] data = new CommandFormatter(command, tokenID).getData();
-        //受信データを読み込んだサイズまで切り詰め
         byte[] receiveData = request(data);
         return receiveData[0] == 1;
     }

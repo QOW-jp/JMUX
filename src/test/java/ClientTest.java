@@ -54,7 +54,7 @@ public class ClientTest {
 
             try {
                 System.out.println("send : " + jmuxClient.send(command, tokenID));
-            } catch (IOException | UntrustedConnectException | ClosedServerException e) {
+            } catch (UntrustedConnectException | ClosedServerException e) {
                 throw new RuntimeException(e);
             }
 
