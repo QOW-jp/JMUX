@@ -5,6 +5,7 @@ import com.qow.net.qtcp.TCPServer;
 import com.qow.util.ThreadStopper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,8 +88,14 @@ public class JMUX extends TCPServer implements Runnable {
             try {
                 listeningRequest();
                 err = 0;
-            } catch (IOException | UntrustedConnectException e) {
-                if (1 < err++) System.err.println(e.getMessage());
+            } catch (UntrustedConnectException e) {
+                System.err.println(e.getMessage());
+                System.err.println(err++);
+                System.err.println("send protocol id. at: " + new String(e.getSendProtocolID(), StandardCharsets.UTF_8));
+                System.err.println("receive protocol id. at: " + new String(e.getReceiveProtocolID(), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                System.err.println(err++);
             }
         }
         try {
