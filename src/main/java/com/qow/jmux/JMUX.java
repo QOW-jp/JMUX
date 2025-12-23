@@ -1,7 +1,7 @@
 package com.qow.jmux;
 
-import com.qow.qtcp.TCPServer;
-import com.qow.qtcp.UntrustedConnectException;
+import com.qow.net.UntrustedConnectException;
+import com.qow.net.qtcp.TCPServer;
 import com.qow.util.ThreadStopper;
 
 import java.io.IOException;

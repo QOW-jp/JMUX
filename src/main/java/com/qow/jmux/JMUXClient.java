@@ -1,8 +1,8 @@
 package com.qow.jmux;
 
-import com.qow.qtcp.ClosedServerException;
-import com.qow.qtcp.TCPClient;
-import com.qow.qtcp.UntrustedConnectException;
+import com.qow.net.ClosedServerException;
+import com.qow.net.UntrustedConnectException;
+import com.qow.net.qtcp.TCPClient;
 
 /**
  * {@link JMUX}と通信するためのクライアント

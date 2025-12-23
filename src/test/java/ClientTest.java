@@ -1,7 +1,7 @@
 import com.qow.jmux.Command;
 import com.qow.jmux.JMUXClient;
-import com.qow.qtcp.ClosedServerException;
-import com.qow.qtcp.UntrustedConnectException;
+import com.qow.net.ClosedServerException;
+import com.qow.net.UntrustedConnectException;
 import com.qow.util.qon.NoSuchKeyException;
 import com.qow.util.qon.QONObject;
 import com.qow.util.qon.UntrustedQONException;
