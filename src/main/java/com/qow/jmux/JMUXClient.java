@@ -4,6 +4,8 @@ import com.qow.net.ClosedServerException;
 import com.qow.net.UntrustedConnectException;
 import com.qow.net.qtcp.TCPClient;
 
+import java.net.SocketTimeoutException;
+
 /**
  * {@link JMUX}と通信するためのクライアント
  *
@@ -31,9 +33,9 @@ public class JMUXClient extends TCPClient {
      * @throws UntrustedConnectException 接続が途切れた場合
      * @throws ClosedServerException     サーバーのポートが無効化されている場合
      */
-    public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException {
+    public boolean send(Command command, int tokenID) throws UntrustedConnectException, ClosedServerException, SocketTimeoutException {
         byte[] data = new CommandFormatter(command, tokenID).getData();
-        byte[] receiveData = request(data);
+        byte[] receiveData = request(data, true);
         return receiveData[0] == 1;
     }
 }

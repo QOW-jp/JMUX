@@ -42,7 +42,6 @@ public class ServerTest {
             System.out.println("start JMUX : " + jmux.enable());
             jmux.waitForServer();
         }
-        System.exit(3);
     }
 
     public static class TokenTest extends Token {
